@@ -16,7 +16,7 @@ public class Resource {
     private float storage;
 
     public Resource() {
-        this.cpu = 0.0F;
+        this.cpu = 1.0F;
         this.mem = 1.0F;
         this.storage = 1.0F;
     }

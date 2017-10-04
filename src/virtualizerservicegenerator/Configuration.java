@@ -5,6 +5,7 @@
  */
 package virtualizerservicegenerator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.w3c.dom.Node;
@@ -37,21 +38,40 @@ public class Configuration {
     
     private Configuration() {}
     
-    public void initialiseConfiguration(String server, int port) throws Exception {
+    
+    //creates structure without the get-config based on default values
+    public void initialiseConfiguration(String port1, String port2) {
+        id = "SingleBiSBiS";
+        name = "Single-BiSBiS-View";
+        
+        nodeId = "SingleBiSBiS";
+        nodeName = "SingleBiSBiS";
+        nodeType = "BiSBiS";
+        
+        port1ID = port1;
+        port2ID = port2;
+    }
+    
+    public void initialiseConfiguration(String server, int port) throws IOException {
         rest = new Resty();
         url = "http://" + server + ":" + port + "/escape";
-        xml = rest.xml(url + "/get-config?blocking");
         
-        // xpath queries normalised on 'virtualizer' element
-        id = getXMLNodeValue("id");
-        name = getXMLNodeValue("name");
-        
-        nodeId = getXMLNodeValue("nodes/node/id");
-        nodeName = getXMLNodeValue("nodes/node/name");
-        nodeType = getXMLNodeValue("nodes/node/type");
-        
-        port1ID = getXMLNodeValues("nodes/node/ports/port/id").get(0);
-        port2ID = getXMLNodeValues("nodes/node/ports/port/id").get(1);
+        try {
+            xml = rest.xml(url + "/get-config?blocking");
+
+            // xpath queries normalised on 'virtualizer' element
+            id = getXMLNodeValue("id");
+            name = getXMLNodeValue("name");
+
+            nodeId = getXMLNodeValue("nodes/node/id");
+            nodeName = getXMLNodeValue("nodes/node/name");
+            nodeType = getXMLNodeValue("nodes/node/type");
+
+            port1ID = getXMLNodeValues("nodes/node/ports/port/id").get(0);
+            port2ID = getXMLNodeValues("nodes/node/ports/port/id").get(1);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
     
       
