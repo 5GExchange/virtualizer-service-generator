@@ -42,12 +42,12 @@ public final class BiSBiSNode extends Node {
     }
     
       
-    public void createMultiLinearTopology(int branches) {
-        addNode(branches+1);
+    public void createMultiLinearTopology(int chains) {
+        addNode(chains+1);
         for (int i=1; i<nodes-1; i++)
             addNode(2);
-        addNode(branches+1);
-        createMultiLinearFlowEntries(branches);
+        addNode(chains+1);
+        createMultiLinearFlowEntries(chains);
         
     }
 

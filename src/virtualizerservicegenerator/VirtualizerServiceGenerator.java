@@ -23,8 +23,10 @@ public class VirtualizerServiceGenerator {
     public static void main(String[] args) {
         String server;
         int port;
-        int nodes = 20;
-        int branches = 5;
+        int chainSize = 4;
+        int chains = 1;
+        int totalVnfs;
+        
         String nodeType = "vlsp:router";
         String SAP1id = null;
         String SAP2id = null;
@@ -49,8 +51,8 @@ public class VirtualizerServiceGenerator {
                     
                     server = prop.getProperty("orchestrator.address");
                     port = Integer.parseInt(prop.getProperty("orchestrator.port"));
-                    nodes = Integer.parseInt(prop.getProperty("nodes.total"));
-                    branches = Integer.parseInt(prop.getProperty("nodes.branches"));
+                    chains = Integer.parseInt(prop.getProperty("chains.number"));
+                    chainSize = Integer.parseInt(prop.getProperty("chain.size"));
                     nodeType = prop.getProperty("nodes.type");
                     SAP1id = prop.getProperty("sap.in");
                     SAP2id = prop.getProperty("sap.out");
@@ -69,9 +71,8 @@ public class VirtualizerServiceGenerator {
                     else {
                         System.err.println("Error: no SAPs have been found");
                         System.exit(3);
-                    } 
-                        
-                
+                    }
+                    
                 }
                 catch (FileNotFoundException fex) {
                     System.err.println("Error while accessing the property file: " + fex.getMessage());
@@ -86,8 +87,8 @@ public class VirtualizerServiceGenerator {
             case 4:
                 try {
                     // generating the request without performing the submission
-                    nodes = Integer.valueOf(args[0]);
-                    branches = Integer.valueOf(args[1]);
+                    chains = Integer.valueOf(args[0]);
+                    chainSize = Integer.valueOf(args[1]);
                     SAP1id = args[2];
                     SAP2id = args[3];
                     submit = false;
@@ -96,8 +97,8 @@ public class VirtualizerServiceGenerator {
                     // generating the request and performing the submission
                     server = args[0];
                     port = Integer.valueOf(args[1]);
-                    nodes = Integer.valueOf(args[2]);
-                    branches = Integer.valueOf(args[3]);
+                    chains = Integer.valueOf(args[2]);
+                    chainSize = Integer.valueOf(args[3]);
                     submit = true;
                     try {
                         conf.initialiseConfiguration(server, port);
@@ -109,41 +110,46 @@ public class VirtualizerServiceGenerator {
                 break;
                 
             default:
+                SAP1id = "SAP0";
+                SAP2id = "SAP1";
+                conf.initialiseConfiguration(SAP1id, SAP2id);
+                
                 System.err.println(  "Wrong number of parameters - please use either:"
                                    + "\n ROaddress ROport Nnodes Nchains"
                                    + "\n Nnodes Nchains sap_in sap_out");
-                System.exit(4);
+                
+                System.out.println("Using default values: " + chains + "x" + chainSize + "and" + SAP1id + "-" + SAP2id);
         }
         
         try {
+            totalVnfs = chains * chainSize;
             Instant t = Instant.now();
             conf.setNodeTypeToDeploy(nodeType);
-            Virtualizer s1 = new Virtualizer(conf.getId(), conf.getName(), nodes);
-            s1.instantiateMultiLinear(branches);
+            Virtualizer s1 = new Virtualizer(conf.getId(), conf.getName(), totalVnfs);
+            s1.instantiateMultiLinear(chains);
             String request = s1.toXML();
             
-            fw = new FileWriter(xmlsPath + "/edit_config_create_" + nodes + "-" + branches + "_" + t.toEpochMilli() + ".xml");
+            fw = new FileWriter(xmlsPath + "/edit_config_create_" + chains + "-" + chainSize + "_" + t.toEpochMilli() + ".xml");
             pw = new PrintWriter(fw);
             pw.print(request);
             pw.close();
             
             if (submit) {
-                System.out.println("Submitting create request");
+                System.out.println("create request");
                 s1.submitRequest();
-                System.out.println("Done");
-                System.in.read(); // should be removed to use ESCAPE callbacks
+                System.in.read(); // FIXME
             }
             
             s1.setDeleteOperation();
             request = s1.toXML();
-            fw = new FileWriter(xmlsPath + "/edit_config_delete_" + nodes + "-" + branches + "_" + t.toEpochMilli() + ".xml");
+            fw = new FileWriter(xmlsPath + "/edit_config_delete_" + chains + "-" + chainSize + "_" + t.toEpochMilli() + ".xml");
             pw = new PrintWriter(fw);
             pw.print(request);
             pw.close();
             
             
             if (submit) {
-                System.out.println("Submitting delete request");
+                System.out.println("delete request");
                 s1.submitRequest();
             }
 

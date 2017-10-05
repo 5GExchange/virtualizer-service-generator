@@ -39,7 +39,7 @@ public class FlowTable {
     }
     
     
-    public void generateMultiLinearFlowEntries(List<NodeResource> nodes, int branches) {
+    public void generateMultiLinearFlowEntries(List<NodeResource> nodes, int chains) {
         NodeResource node1, node2;
         List<Port> node1Ports, node2Ports;
         int port1ID, port2ID;
@@ -53,8 +53,8 @@ public class FlowTable {
         FlowEntrySAPOut feSAP1Out = new FlowEntrySAPOut(conf.getId(), node1.getId(), conf.getPort1ID(), node1Ports.get(0).getId());
         this.flowentries.add(feSAP1Out);
         
-        for (int k=0; k<branches; k++) {
-            int groupSize = nodes.size()/branches;
+        for (int k=0; k<chains; k++) {
+            int groupSize = nodes.size()/chains;
             int start = groupSize*k;
 
             
@@ -97,7 +97,7 @@ public class FlowTable {
             node2 = nodes.get(nodes.size()-1);
             node2Ports = node2.getPorts();
 
-            port2ID = node2Ports.get(k+1).getId();
+            port2ID = node2Ports.get(k).getId();
 
             FlowEntry fe = new FlowEntry(node1.getId(), 
                                          node2.getId(), 

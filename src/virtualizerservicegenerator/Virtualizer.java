@@ -78,8 +78,8 @@ public class Virtualizer {
     }
 
     
-    public void instantiateMultiLinear(int branches) {
-        this.nodes.get(0).createMultiLinearTopology(branches);
+    public void instantiateMultiLinear(int chains) {
+        this.nodes.get(0).createMultiLinearTopology(chains);
     }
     
     
