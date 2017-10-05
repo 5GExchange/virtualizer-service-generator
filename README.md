@@ -23,11 +23,13 @@ $ java -jar dist/VirtualizerServiceGenerator.jar <conf.properties>
 
 An example of properties file is available in the project root folder and is called conf.properties:
 
-> orchestrator.address=localhost
-> orchestrator.port=8888
-> chains.number=5
-> chain.size=10
-> nodes.type=vlsp:router
-> sap.in=SAP0
-> sap.out=SAP1
-> submit=true
+```sh
+orchestrator.address=localhost
+orchestrator.port=8888
+chains.number=5
+chain.size=10
+nodes.type=vlsp:router
+sap.in=SAP0
+sap.out=SAP1
+submit=true
+```
